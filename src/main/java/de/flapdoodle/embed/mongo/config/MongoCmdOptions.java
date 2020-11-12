@@ -47,17 +47,17 @@ public interface MongoCmdOptions {
 
 	@Default
 	default boolean useNoPrealloc() {
-		return true;
+		return false;
 	}
 
 	@Default
 	default boolean useSmallFiles() {
-		return true;
+		return false;
 	}
 
 	@Default
 	default boolean useNoJournal() {
-		return true;
+		return false;
 	}
 
 	@Default

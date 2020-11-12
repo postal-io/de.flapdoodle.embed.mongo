@@ -36,6 +36,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
 import de.flapdoodle.embed.mongo.config.Defaults;
+import de.flapdoodle.embed.mongo.config.ImmutableMongoCmdOptions;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Feature;
@@ -63,7 +64,7 @@ public class MongoDBRuntimeTest {
 	@Test
 	public void testDistributions() throws IOException {
 		Builder defaultBuilder = Defaults.runtimeConfigFor(Command.MongoD);
-		
+
 		RuntimeConfig config = defaultBuilder.build();
 
 		for (Platform platform : Platform.values()) {
@@ -85,12 +86,12 @@ public class MongoDBRuntimeTest {
 											return true;
 										}
 									}).build())).build();
-		
+
 		Platform platform = Platform.Windows;
 		BitSize bitsize = BitSize.B64;
 		for (IFeatureAwareVersion version : Versions.testableVersions(Version.Main.class)) {
-			// there is no windows 2008 version for 1.8.5 
-			boolean skip = ((version.asInDownloadPath().equals(Version.V1_8_5.asInDownloadPath()))
+			// there is no windows 2008 version for 1.8.5
+			boolean skip = ((version.asInDownloadPath().equals(Version.V1_8_5.asInDownloadPath()) || version.asInDownloadPath().compareTo(Version.V4_0_2.asInDownloadPath()) > 0)
 					&& (platform == Platform.Windows) && (bitsize == BitSize.B64));
 			if (!skip)
 				check(config, Distribution.of(version, platform, bitsize));
@@ -102,7 +103,7 @@ public class MongoDBRuntimeTest {
 		if (version.enabled(Feature.ONLY_64BIT) && bitsize==BitSize.B32) {
 			return true;
 		}
-		
+
 		if ((platform == Platform.OS_X) && (bitsize == BitSize.B32)) {
 			// there is no osx 32bit version for v2.2.1 and above, so we dont check
 			return true;
@@ -132,14 +133,23 @@ public class MongoDBRuntimeTest {
 		int port = Network.getFreeServerPort();
 		MongodProcess mongodProcess = null;
 		MongodExecutable mongod = null;
-		
+
 		RuntimeConfig runtimeConfig = Defaults.runtimeConfigFor(Command.MongoD).build();
 		MongodStarter runtime = MongodStarter.getInstance(runtimeConfig);
 
 		timer.check("After Runtime");
 
 		try {
-			mongod = runtime.prepare(MongodConfig.builder().version(Version.Main.PRODUCTION).net(new Net(port, Network.localhostIsIPv6())).build());
+			MongodConfig mongoConfig = MongodConfig.builder()
+					.version(Version.Main.PRODUCTION)
+					.net(new Net(port, Network.localhostIsIPv6()))
+					.cmdOptions(ImmutableMongoCmdOptions.builder()
+							.useNoJournal(false)
+							.useNoPrealloc(false)
+							.useSmallFiles(false)
+							.build())
+					.build();
+			mongod = runtime.prepare(mongoConfig);
 			timer.check("After mongod");
 			assertNotNull("Mongod", mongod);
 			mongodProcess = mongod.start();
