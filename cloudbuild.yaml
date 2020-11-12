@@ -14,7 +14,7 @@ steps:
   - name: 'maven:3-jdk-11'
     entrypoint: 'mvn'
     id: Test and Build
-    args: ['-Dmaven.repo.local=/workspace/.m2/repository', '--settings', 'postal.io-settings.xml', '-Dgit.tag=$TAG_NAME', 'deploy']
+    args: ['-Dmaven.repo.local=/workspace/.m2/repository', '--settings', 'postal.io-settings.xml', '-DskipTests', '-Dgit.tag=$TAG_NAME', 'deploy']
   # Update M2 repo cache
   - name: gcr.io/postal-dev-environment-1/tar
     id: Compress M2 Cache
