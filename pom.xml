@@ -8,7 +8,7 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.flapdoodle.embed</groupId>
+	<groupId>com.postalio</groupId>
 	<artifactId>de.flapdoodle.embed.mongo</artifactId>
 	<name>Flapdoodle Embedded MongoDB</name>
 	<version>3.0.1-SNAPSHOT</version>
