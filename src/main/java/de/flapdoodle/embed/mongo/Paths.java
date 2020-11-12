@@ -95,7 +95,8 @@ public class Paths implements PackageResolver {
 		ArchiveType archiveType = getArchiveType(distribution);
 		String archiveTypeStr = getArchiveString(archiveType);
 
-        String platformStr = getPlattformString(distribution);
+        String platformRoute = getPlattformString(distribution);
+        String platformFileStr = getPlatformFileString(distribution);
 
         String bitSizeStr = getBitSize(distribution);
 
@@ -105,10 +106,10 @@ public class Paths implements PackageResolver {
                         + versionStr;
 		}
 		if (distribution.platform() == Platform.OS_X && withSsl(distribution) ) {
-            return platformStr + "/mongodb-" + platformStr + "-ssl-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
+            return platformRoute + "/mongodb-" + platformFileStr + "-ssl-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
         }
 
-		return platformStr + "/mongodb-" + platformStr + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
+		return platformRoute + "/mongodb-" + platformFileStr + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
 	}
 
     private String getArchiveString(ArchiveType archiveType) {
@@ -149,6 +150,34 @@ public class Paths implements PackageResolver {
         }
         return splatform;
     }
+
+	private String getPlatformFileString(Distribution distribution) {
+		String splatform;
+		switch (distribution.platform()) {
+			case Linux:
+				splatform = "linux";
+				break;
+			case Windows:
+				splatform = "win32";
+				break;
+			case OS_X:
+				if (distribution.version().asInDownloadPath().compareTo(de.flapdoodle.embed.mongo.distribution.Version.V4_0_12.asInDownloadPath()) <= 0) {
+					splatform = "osx";
+				} else {
+					splatform = "macos";
+				}
+				break;
+			case Solaris:
+				splatform = "sunos5";
+				break;
+			case FreeBSD:
+				splatform = "freebsd";
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown Platform " + distribution.platform());
+		}
+		return splatform;
+	}
 
     private String getBitSize(Distribution distribution) {
         String sbitSize;

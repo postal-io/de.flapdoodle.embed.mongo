@@ -59,6 +59,8 @@ public class TestPaths extends TestCase {
 		checkPath(Distribution.of(Version.V1_9_0, Platform.OS_X, BitSize.B32), "osx/mongodb-osx-i386-1.9.0.tgz");
 		checkPath(Distribution.of(Version.V1_9_0, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-x86_64-1.9.0.tgz");
 		checkPath(Distribution.of(Version.V3_6_0, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-ssl-x86_64-3.6.0.tgz");
+
+		checkPath(Distribution.of(Version.V4_2_10, Platform.OS_X, BitSize.B64), "osx/mongodb-macos-x86_64-4.2.10.tgz");
 	}
 
 	private void checkPath(Distribution distribution, String match) {
