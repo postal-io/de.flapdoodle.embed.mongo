@@ -22,6 +22,7 @@ package de.flapdoodle.embed.mongo;
 
 import de.flapdoodle.embed.mongo.distribution.Feature;
 import de.flapdoodle.embed.mongo.distribution.IFeatureAwareVersion;
+import de.flapdoodle.embed.mongo.distribution.LinuxDistro;
 import de.flapdoodle.embed.process.config.store.DistributionPackage;
 import de.flapdoodle.embed.process.config.store.FileSet;
 import de.flapdoodle.embed.process.config.store.FileType;
@@ -42,7 +43,7 @@ public class Paths implements PackageResolver {
 	public Paths(Command command) {
 		this.command=command;
 	}
-	
+
 	@Override
 	public DistributionPackage packageFor(Distribution distribution) {
 		return DistributionPackage.of(getArchiveType(distribution), getFileSet(distribution), getPath(distribution));
@@ -85,7 +86,11 @@ public class Paths implements PackageResolver {
 		return archiveType;
 	}
 
-	public String getPath(Distribution distribution) {
+    public String getPath(Distribution distribution) {
+	    return getPath(distribution, null);
+    }
+
+	public String getPath(Distribution distribution, LinuxDistro linuxDistro) {
 		String versionStr = getVersionPart(distribution.version());
 
 		if (distribution.platform() == Platform.Solaris && isFeatureEnabled(distribution, Feature.NO_SOLARIS_SUPPORT)) {
@@ -100,6 +105,22 @@ public class Paths implements PackageResolver {
 
         String bitSizeStr = getBitSize(distribution);
 
+        if (distribution.platform() == Platform.Linux) {
+            final String linuxDistroStr;
+            if (linuxDistro == null) {
+                linuxDistroStr = getLinuxDistroString(LinuxDistro.detect());
+            } else {
+                linuxDistroStr = getLinuxDistroString(linuxDistro);
+            }
+
+            return platformRoute + "/mongodb-" +
+                    platformFileStr +
+                    "-" + bitSizeStr +
+                    "-" + linuxDistroStr +
+                    "-" + versionStr +
+                    "." + archiveTypeStr;
+        }
+
         if ((distribution.bitsize()==BitSize.B64) && (distribution.platform()==Platform.Windows)) {
 				versionStr = (useWindows2008PlusVersion(distribution) ? "2008plus-": "")
                         + (withSsl(distribution) ? "ssl-": "")
@@ -111,6 +132,19 @@ public class Paths implements PackageResolver {
 
 		return platformRoute + "/mongodb-" + platformFileStr + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
 	}
+
+    private String getLinuxDistroString(LinuxDistro linuxDistro) {
+        switch (linuxDistro) {
+            case DEBIAN_9_2:
+                return "debian92";
+
+            case DEBIAN_10:
+                return "debian10";
+
+            default:
+                throw new IllegalArgumentException("Missing case for LinuxDistro: " + linuxDistro);
+        }
+    }
 
     private String getArchiveString(ArchiveType archiveType) {
         String sarchiveType;

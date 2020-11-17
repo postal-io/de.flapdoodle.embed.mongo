@@ -20,6 +20,7 @@
  */
 package de.flapdoodle.embed.mongo;
 
+import de.flapdoodle.embed.mongo.distribution.LinuxDistro;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.distribution.BitSize;
 import de.flapdoodle.embed.process.distribution.Distribution;
@@ -48,9 +49,7 @@ public class TestPaths extends TestCase {
 				"win32/mongodb-win32-i386-1.6.5.zip");
 		checkPath(Distribution.of(Version.V1_6_5, Platform.Windows, BitSize.B64),
 				"win32/mongodb-win32-x86_64-1.6.5.zip");
-		checkPath(Distribution.of(Version.V1_8_0, Platform.Linux, BitSize.B32), "linux/mongodb-linux-i686-1.8.0.tgz");
-		checkPath(Distribution.of(Version.V1_8_0, Platform.Linux, BitSize.B64),
-				"linux/mongodb-linux-x86_64-1.8.0.tgz");
+
 		checkPath(Distribution.of(Version.V1_8_0, Platform.OS_X, BitSize.B32), "osx/mongodb-osx-i386-1.8.0.tgz");
 		checkPath(Distribution.of(Version.V1_8_0, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-x86_64-1.8.0.tgz");
 		checkPath(Distribution.of(Version.V1_8_1, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-x86_64-1.8.1.tgz");
@@ -60,11 +59,20 @@ public class TestPaths extends TestCase {
 		checkPath(Distribution.of(Version.V1_9_0, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-x86_64-1.9.0.tgz");
 		checkPath(Distribution.of(Version.V3_6_0, Platform.OS_X, BitSize.B64), "osx/mongodb-osx-ssl-x86_64-3.6.0.tgz");
 
+		// 4.2.10
 		checkPath(Distribution.of(Version.V4_2_10, Platform.OS_X, BitSize.B64), "osx/mongodb-macos-x86_64-4.2.10.tgz");
+
+
+		checkPath(Distribution.of(Version.V4_2_10, Platform.Linux, BitSize.B64), LinuxDistro.DEBIAN_10,
+				"linux/mongodb-linux-x86_64-debian10-4.2.10.tgz");
 	}
 
 	private void checkPath(Distribution distribution, String match) {
 		assertEquals("" + distribution, match, paths.getPath(distribution));
+	}
+
+	private void checkPath(Distribution distribution, LinuxDistro linuxDistro, String match) {
+		assertEquals("" + distribution, match, paths.getPath(distribution, linuxDistro));
 	}
 
 	public void testPaths() {
