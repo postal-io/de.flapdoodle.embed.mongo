@@ -114,6 +114,9 @@ public class MongoDBRuntimeTest {
 		if (platform == Platform.FreeBSD) {
 			return true;
 		}
+		if (platform == Platform.Linux) {
+			return true;
+		}
 		return false;
 	}
 
